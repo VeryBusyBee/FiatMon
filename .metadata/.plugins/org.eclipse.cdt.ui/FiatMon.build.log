@@ -1,0 +1,10 @@
+13:17:50 **** Incremental Build of configuration Debug for project FiatMon ****
+make -j4 all 
+arm-none-eabi-size   FiatMon.elf 
+   text	   data	    bss	    dec	    hex	filename
+  41384	   1832	   8176	  51392	   c8c0	FiatMon.elf
+Finished building: default.size.stdout
+ 
+
+13:17:51 Build Finished. 0 errors, 0 warnings. (took 530ms)
+

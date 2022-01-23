@@ -1,0 +1,4 @@
+can.cpp:19:6:void CANInit()	4	static
+can.cpp:25:6:void CAN_Send(uint8_t*, uint8_t, uint32_t)	32	static
+can.cpp:34:6:void CAN_Sleep()	8	static
+can.cpp:44:6:void CAN_Resume()	8	static
