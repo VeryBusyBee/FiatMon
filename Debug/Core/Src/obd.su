@@ -1,3 +1,0 @@
-obd.cpp:31:6:void HandleOBDMsg(CAN_RxHeaderTypeDef, uint8_t*)	16	static
-obd.cpp:132:6:void RequestOBD()	24	static
-obd.cpp:145:10:uint16_t CalcAvgEcon(uint16_t)	24	static

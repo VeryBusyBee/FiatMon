@@ -1,6 +1,0 @@
-usart.cpp:18:9:uint8_t halfbyte_to_hexascii(uint8_t)	16	static
-usart.cpp:25:9:uint8_t hexascii_to_halfbyte(uint8_t)	16	static
-usart.cpp:33:6:void UARTWait4Char()	8	static
-usart.cpp:38:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	16	static
-usart.cpp:101:6:void Send2CANHacker(CANMsg_t)	24	static
-usart.cpp:132:6:void Send2CANSniffer(CANMsg_t)	16	static

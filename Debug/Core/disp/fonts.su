@@ -1,8 +1,0 @@
-fonts.cpp:10:1:Font::Font()	16	static
-fonts.cpp:21:1:Font::Font(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t*, uint8_t*, uint8_t)	16	static
-fonts.cpp:32:9:uint8_t Font::getWidth()	16	static
-fonts.cpp:37:9:uint8_t Font::getWidth(uint8_t)	24	static
-fonts.cpp:54:9:uint8_t Font::getCharData(uint8_t, uint8_t)	24	static
-fonts.cpp:89:9:uint8_t Font::getCharData(uint8_t)	24	static
-fonts.cpp:99:9:uint8_t Font::getCharBytes(uint8_t)	24	static
-fonts.cpp:117:9:uint8_t Font::setChar(uint8_t)	24	static
