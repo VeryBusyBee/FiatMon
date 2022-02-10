@@ -90,6 +90,7 @@ int16_t DispNBri = 0x6000;	//Night brightness
 uint64_t carDate;
 int32_t carEcon1;
 int32_t carEcon2;
+bool econMode;	//0 - LPH (Liters Per Hour), 1 - LPK (Liters Per 100 Km)
 
 bool CANHacker_active;
 
@@ -111,7 +112,7 @@ static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_CAN_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_TIM3_Init(void);
+//static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
 void StartScreenTask(void const * argument);
@@ -511,21 +512,22 @@ static void MX_TIM2_Init(void)
   * @param None
   * @retval None
   */
+/*
 static void MX_TIM3_Init(void)
 {
 
-  /* USER CODE BEGIN TIM3_Init 0 */
+*/  /* USER CODE BEGIN TIM3_Init 0 */
 
   /* USER CODE END TIM3_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+/*  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
-  /* USER CODE BEGIN TIM3_Init 1 */
+*/  /* USER CODE BEGIN TIM3_Init 1 */
 
   /* USER CODE END TIM3_Init 1 */
-  htim3.Instance = TIM3;
+/*  htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 65535;
@@ -558,13 +560,13 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM3_Init 2 */
+*/  /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
-  HAL_TIM_MspPostInit(&htim3);
+/*  HAL_TIM_MspPostInit(&htim3);
 
 }
-
+*/
 /**
   * @brief USART1 Initialization Function
   * @param None
@@ -676,16 +678,14 @@ void StartScreenTask(void const * argument)
   for(;;)
   {
 	  vTaskSuspend( NULL );//wait for a time to refresh the screen
-//	  if (carConn)
-//	  {
-		  FormatItems();
-		  UpdateScreen();
-		  RequestOBD();
-//	  }
+
+	  FormatItems();
+	  UpdateScreen();
+
+	  RequestOBD();
 
 //	  HAL_GPIO_TogglePin(BOARD_LED_GPIO_Port, BOARD_LED_Pin);
 
-//	  CAN_Send(message, sizeof(message), address);
   }
   /* USER CODE END 5 */
 }
@@ -714,7 +714,7 @@ void StartCANTask(void const * argument)
 
 //	uint8_t message[] = {0x20,0x00,0x48,0x00,0x00,0x18,0x20,0x00};
 //	uint32_t address = CAR_STAT1_ID;
-	uint32_t address2 = CAR_STAT3_ID;
+//	uint32_t address2 = CAR_STAT3_ID;
 
 //	uint8_t message[] = {0x0,0x3D,0x32,0x8C,0x0,0x0,0x0,0x00};
 //	uint32_t address = CAR_ECTEMP_ID;

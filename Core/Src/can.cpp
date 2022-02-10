@@ -15,6 +15,7 @@ uint32_t TxMailbox;
 uint8_t rxData[16]; //declare a receive data buffer
 CAN_FilterTypeDef sFilterConfig; //declare CAN filter structure
 
+extern uint16_t canQueueMax;
 
 void CANInit(void){
 
@@ -38,6 +39,8 @@ void CAN_Sleep()
 	SET_BIT(hcan.Instance->MCR, CAN_MCR_AWUM); //activate automatic bxCAN wakeup
 
 	HAL_GPIO_WritePin(TJA_S_GPIO_Port, TJA_S_Pin, GPIO_PIN_SET);	//set TJA1050 silent mode
+
+	canQueueMax = 0;
 
 }
 

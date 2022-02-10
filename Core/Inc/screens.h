@@ -125,7 +125,8 @@ public:
 	TextItem(char *st) {str = st;}
 	TextItem(char *, uint8_t, uint8_t, uint8_t, uint8_t);
 
-	char * getValue(void) {return str;}
+	char * getText(void) {return str;}
+	void setText(char *text) {str = text;}
 
 	void DrawItem(void);
 };

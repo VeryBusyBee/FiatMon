@@ -10,6 +10,7 @@
 #include <math.h>
 #include "screens.h"
 #include "main.h"
+#include "obd.h"
 #include "../disp/disp.h"
 
 //uint8_t currScreen = 0;
@@ -29,38 +30,43 @@ extern int16_t DispNBri;	//Night brightness
 extern uint64_t carDate;
 extern int32_t carEcon1;
 extern int32_t carEcon2;
+extern bool econMode;	//0 - LPH (Liters Per Hour), 1 - LPK (Liters Per 100 Km)
 
 extern int16_t CANfifo1, CANfifo2;
 extern int16_t canQueueMax;
 
-uint8_t blinkCounter;
+extern int16_t DispDBri;	//Day brightness
+extern int16_t DispNBri;	//Night brightness
+
+uint8_t blinkCounter = 0, prevBlinkCounter = 0;
 
 IntNumItem *speedItem = new IntNumItem(&carSpeed, 72, 8, FNT_BIG, 3, DISPLAY_RALIGN);
-TextItem *spdLabelItem = new TextItem("km/h", 70, 0, FNT_SM, DISPLAY_RALIGN);
+TextItem *spdLabelItem = new TextItem((char *)"km/h", 70, 0, FNT_SM, DISPLAY_RALIGN);
 
 RealNumItem *econ1Item = new RealNumItem(&carEcon1, 121, 8, FNT_MED, 3, 1, DISPLAY_HIDE | DISPLAY_RALIGN);
-TextItem *econLabelItem = new TextItem("l/100km", 121, 0, FNT_SM, DISPLAY_HIDE | DISPLAY_RALIGN);
+RealNumItem *econ2Item = new RealNumItem(&carEcon2, 121, 24, FNT_MED, 3, 1, DISPLAY_HIDE | DISPLAY_RALIGN);
+TextItem *econLabelItem = new TextItem((char *)"l/100km", 121, 0, FNT_SM, DISPLAY_HIDE | DISPLAY_RALIGN);
 
-IntNumItem *tempItem = new IntNumItem(&carTemp, 121, 48, FNT_MED, 3, DISPLAY_HIDE | DISPLAY_RALIGN);
-TextItem *tempLabelItem = new TextItem("o", 127, 48, FNT_SM, DISPLAY_HIDE | DISPLAY_RALIGN);
+IntNumItem *tempItem = new IntNumItem(&carTemp, 121, 48, FNT_MED, 3, DISPLAY_RALIGN);
+TextItem *tempLabelItem = new TextItem((char *)"o", 127, 48, FNT_SM, DISPLAY_RALIGN);
 BitmapItem *ETbmpItem = new BitmapItem(&bmpETemp, 71, 48, DISPLAY_HIDE);
 
-TextItem *noConnItem = new TextItem("x", 0, 0, FNT_SM, DISPLAY_HIDE);
+TextItem *noConnItem = new TextItem((char *)"x", 0, 0, FNT_SM, DISPLAY_HIDE);
 
 BitmapItem *brakeItem = new BitmapItem(&bmpBrake, 43, 8, DISPLAY_HIDE | DISPLAY_BLINK_SLOW | DISPLAY_REV);
 
-IntNumItem *Can1Item = new IntNumItem(&CANfifo1, 20, 40, FNT_SM, 5, DISPLAY_NORM);
+IntNumItem *Can1Item = new IntNumItem(&CANfifo1, 20, 40, FNT_SM, 5, DISPLAY_HIDE);
 IntNumItem *Can2Item = new IntNumItem(&carRPM, 80, 40, FNT_SM, 5, DISPLAY_NORM);
 IntNumItem *Can3Item = new IntNumItem(&canQueueMax, 0, 40, FNT_SM, 5, DISPLAY_NORM);
 
-TextItem *HiItem = new TextItem("Hi!", 48, 24, FNT_SM, DISPLAY_NORM);
-TextItem *ByItem = new TextItem("By...", 48, 24, FNT_SM, DISPLAY_NORM);
+TextItem *HiItem = new TextItem((char *)"Hi!", 48, 24, FNT_SM, DISPLAY_NORM);
+TextItem *ByItem = new TextItem((char *)"By...", 48, 24, FNT_SM, DISPLAY_NORM);
 
 ScreenItem **currScreen;
 
 ScreenItem *scrItems[] = {	noConnItem,
 							spdLabelItem, speedItem,
-							econLabelItem, econ1Item,
+							econLabelItem, econ1Item, econ2Item,
 							tempLabelItem, tempItem,
 							brakeItem,
 							ETbmpItem,
@@ -70,7 +76,7 @@ ScreenItem *scrItems[] = {	noConnItem,
 						};
 
 ScreenItem *scrHi[] = {	HiItem };
-ScreenItem *scrBy[] = {	ByItem };
+ScreenItem *scrBy[] = {	ByItem, noConnItem };
 
 uint8_t items = sizeof(scrItems)/sizeof(*scrItems);	//number of items in array
 
@@ -122,7 +128,10 @@ void HiScreen(void)
 
 void FormatItems(void)
 {
-//Car engine coolant temperature
+	if (carConn) noConnItem->hide();
+	else noConnItem->show();
+
+	//Car engine coolant temperature
 	if (carTemp < 40)
 	{
 		ETbmpItem->show();
@@ -152,9 +161,9 @@ void FormatItems(void)
 		ETbmpItem->beepNo();
 		ETbmpItem->blinkNo();
 
-//		tempItem->hide();
+		tempItem->hide();
 		tempItem->blinkNo();
-//		tempLabelItem->hide();
+		tempLabelItem->hide();
 	}
 
 //Handbrake
@@ -168,32 +177,59 @@ void FormatItems(void)
 		}
 
 //Ignition
-	if (carIgnON) Can2Item->show();	//test
-	else Can2Item->hide();
+//	if (carIgnON) SwitchScreen(NORM_SCREEN);
+//	else SwitchScreen(BY_SCREEN);
 
 //Light
-	if (carLightON) Can1Item->hide();	//test
-	else Can1Item->show();
+	if (carLightON) SetBklit(DispNBri);
+	else SetBklit(DispDBri);
 
 //Engine ON
+	if (carEngON)
+	{
+		Can2Item->show();
+	}
+	else
+	{
+		Can2Item->hide();
+	}
+
+	if (econMode) //LPK
+	{
+		econLabelItem->revNo();
+		econLabelItem->setText("l/Hk");
+	}
+	else
+	{
+		econLabelItem->rev();
+		econLabelItem->setText("l/h");
+	}
 //	if (carEngON)
 //	{
 		econ1Item->show();
+		econ2Item->show();
 		econLabelItem->show();
+
 //	}
 //	else
-//	{
-//		econ1Item->hide();
-//		econLabelItem->hide();
-//	}
-
+/*	{
+		econ1Item->hide();
+		econ2Item->hide();
+		econLabelItem->hide();
+	}
+*/
 }
 
 void UpdateScreen(void)
 {
 	//update blink counter
-	blinkCounter++;
-	blinkCounter &= 7;
+	++blinkCounter;
+	blinkCounter &= 0x0F;
+	if (blinkCounter == 0 && prevBlinkCounter > 0)
+		{
+			updateAvgEcon();	//update averages every 2 sec
+		}
+	prevBlinkCounter = blinkCounter;
 
 //	uint8_t items = sizeof(currScreen)/sizeof(*currScreen);
 

@@ -18,6 +18,6 @@ typedef struct {
 void HandleOBDMsg(CAN_RxHeaderTypeDef pRxHeader, uint8_t *rxData);
 void RequestOBD(void);
 
-uint16_t CalcAvgEcon(uint16_t);
+void updateAvgEcon();
 
 #endif /* INC_OBD_H_ */

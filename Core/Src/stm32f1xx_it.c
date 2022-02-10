@@ -196,7 +196,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 
 	HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &CANMsg.pRxHeader, CANMsg.rxData);
 
-		CANfifo1++;
+		++CANfifo1;
 
 	if ( xCANTaskHandle != NULL )
 	{
@@ -231,7 +231,7 @@ void CAN1_RX1_IRQHandler(void)
 
 	HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO1, &CANMsg.pRxHeader, CANMsg.rxData);
 
-		CANfifo2++;
+		++CANfifo2;
 
 	if ( xCANTaskHandle != NULL )
 	{
@@ -288,7 +288,6 @@ void TIM2_IRQHandler(void)
 	  /* At this point xTaskToNotify should not be NULL as
 	  a transmission was in progress. */
 //	  configASSERT( xScrTaskHandle != NULL );
-	 uint32_t fmTicks = uwTick;
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
