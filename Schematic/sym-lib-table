@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name FiatMon-rescue)(type Legacy)(uri ${KIPRJMOD}/FiatMon-rescue.lib)(options "")(descr ""))
+)
