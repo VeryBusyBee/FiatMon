@@ -33,7 +33,6 @@ void CalcAvgEcon(uint16_t, bool);
 void HandleOBDMsg(CAN_RxHeaderTypeDef pRxHeader, uint8_t *rxData)
 {
 	uint16_t dt;
-	bool ecModePrev = econMode;	//to check if changed
 
 
 	switch (pRxHeader.ExtId)
@@ -53,9 +52,6 @@ void HandleOBDMsg(CAN_RxHeaderTypeDef pRxHeader, uint8_t *rxData)
 				carSpeed = (int16_t)(dt >> 7);
 				carFSpeed = dt / 128;	//speed value as float
 
-				//economy display mode
-				econMode = (carSpeed >0)?true:false;
-
 			}
 			break;
 		case CAR_ECTEMP_ID:
@@ -71,10 +67,14 @@ void HandleOBDMsg(CAN_RxHeaderTypeDef pRxHeader, uint8_t *rxData)
 
 				int32_t econVal;
 
+				//economy display mode
+				bool ecModePrev = econMode;	//to check if changed
+				econMode = (carSpeed >5)?true:false;
+
 				if (econMode)
 					econVal = (uint32_t)((dt*1000/512) / carFSpeed );	//economy in Lp100km
 				else
-					econVal = (uint32_t)(dt*10/512);	//if speed=0 show economy in lph
+					econVal = (uint32_t)(dt*10/512);	//if speed<5, show economy in lph
 
 				CalcAvgEcon(econVal, (econMode != ecModePrev));	//clear the avg buf if mode changed
 			}
