@@ -139,7 +139,7 @@ void FormatItems(void)
 		tempItem->show();
 		tempLabelItem->show();
 	}
-	else if (carTemp > 80)
+	else if (carTemp > 84)
 	{
 		ETbmpItem->show();
 		ETbmpItem->blinkSlow();
