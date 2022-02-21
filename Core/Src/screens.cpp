@@ -233,7 +233,7 @@ void UpdateScreen(void)
 
 	ClearScr();
 	for(int i=0;i<items;i++) {
-		if (currScreen[i]->getOption(DISPLAY_HIDE))
+		if (!currScreen[i]->getOption(DISPLAY_HIDE))
 		{
 			if (currScreen[i]->getOption(DISPLAY_BLINK_FAST))
 			{
