@@ -205,8 +205,9 @@ void DISP_Init(void)
  */
 void DISP_ClearScr(uint8_t style)
 {
-	for (uint16_t i = 0; i < SCREEN_BYTES; i++)
-		scr_buff[i] = style ? 0xff : 0x00;
+	uint8_t color = style ? 0xff : 0x00;
+	for (uint16_t i = 0; i < SCREEN_BYTES; ++i)
+		scr_buff[i] = color;
 }
 
 void DISP_Standby(void)
@@ -450,7 +451,7 @@ void DISP_DrawBitmap(uint16_t x, uint16_t y, BitmapDef *bmp, uint16_t color)
 
 	j = 0;
 	uint16_t bmpBytes = h*w/8;
-	for (i = 0; i < bmpBytes; i++) {
+	for (i = 0; i < bmpBytes; ++i) {
 		b = (color & DISPLAY_REV) ? ~bdata[i] : bdata[i];
 		scr_buff[mem_ptr + j] = b;
 		if (++j >= w) {
@@ -474,33 +475,31 @@ void DISP_DrawChar(uint16_t x, uint16_t y, char ch, Font *font, uint8_t style)
 	uint16_t i, ch_bytes;
 	uint8_t j, b, w, sp = 0;
 
-	y /= 8;	//vertical position should be a multiple of 8
+	y /= 8;	//vertical position must be a multiple of 8
 	uint16_t mem_ptr = y * SCREEN_WIDTH + x + 1;
 
 	if (ch < font->first_char || ch > (font->first_char + font->count)) {
 		ch = font->first_char;
 		sp = 1;	//all chars out of font range are shown as spaces
 		ch_bytes = font->getCharBytes('4');	//bytes for a widest char
-//		ch_bytes = font->setChar('4');	//bytes for a widest char
 	}
 	else
 	{
-//		ch_bytes = font->getCharBytes(ch);	//bytes per char
 		ch_bytes = font->setChar(ch);	//bytes per char
 		sp = 0;
 	}
 
 	w = font->getWidth(ch);
 
+	if ((mem_ptr + w + font->space) >= SCREEN_BYTES) return;	//screen buffer overflow protection
+
 	i = 0;
 	while ( i < ch_bytes) {			//
 		for (j = 0; j < w; j++) {		//row  of vertical bytes
-//			if (sp == 0) b = style ? ~font->getCharData(ch, i+j) : font->getCharData(ch, i+j);
 			if (sp == 0) b = (style & DISPLAY_REV) ? ~font->getCharData(i+j) : font->getCharData(i+j);
 			else b = (style & DISPLAY_REV) ? 0xff : 0;
 
 			scr_buff[mem_ptr + j] = b;
-//			HAL_SPI_Transmit(&hspi1, &b, sizeof(b), HAL_MAX_DELAY);
 
 		}
 		b = (style & DISPLAY_REV) ? 0xff : 0;	//add space after the char

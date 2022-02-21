@@ -765,14 +765,14 @@ void StartCANTask(void const * argument)
 		//No CAN connection
 	  if (carConn == 0)
 	  {
-		  noConnItem->option &= ~DISPLAY_HIDE;
+		  noConnItem->clrOption(DISPLAY_HIDE);
 
 		  GotoSleep();
 		  ResumeFromSleep();
 		  SystemClock_Config(); // restart system clock
 
 	  }
-	  else noConnItem->option |= DISPLAY_HIDE;
+	  else noConnItem->setOption(DISPLAY_HIDE);
 
   }
   /* USER CODE END StartCANTask */

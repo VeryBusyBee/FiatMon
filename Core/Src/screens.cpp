@@ -231,17 +231,15 @@ void UpdateScreen(void)
 		}
 	prevBlinkCounter = blinkCounter;
 
-//	uint8_t items = sizeof(currScreen)/sizeof(*currScreen);
-
 	ClearScr();
 	for(int i=0;i<items;i++) {
-		if ((currScreen[i]->option & DISPLAY_HIDE) == 0 )
+		if (currScreen[i]->getOption(DISPLAY_HIDE))
 		{
-			if ((currScreen[i]->option & DISPLAY_BLINK_FAST) >0)
+			if (currScreen[i]->getOption(DISPLAY_BLINK_FAST))
 			{
 				if ((blinkCounter & 2) > 0 ) currScreen[i]->DrawItem();
 			}
-			else if ((currScreen[i]->option & DISPLAY_BLINK_SLOW) >0)
+			else if (currScreen[i]->getOption(DISPLAY_BLINK_SLOW))
 			{
 				if ((blinkCounter & 4) > 0 ) currScreen[i]->DrawItem();
 			}
@@ -365,35 +363,7 @@ void SetBklit(uint16_t bri)
 }
 
 
-ScreenItem :: ScreenItem()
-{
-	x0 = 0;
-	y0 = 0;
-	size = 8;
-	option = 0;
-}
-
-void ScreenItem :: setOption(uint8_t opt, bool state)
-{
-	state ? (option |= opt) : (option &= ~opt);
-}
-
-bool ScreenItem :: getOption(uint8_t opt)
-{
-	return ((option & opt) > 0) ? true : false;
-}
-
-IntNumItem :: IntNumItem(int16_t *val, uint8_t x, uint8_t y, uint8_t sz, uint8_t intd, uint8_t opt)
-{
-	value = val;
-	x0 = x;
-	y0 = y;
-	size = sz;
-	option = opt;
-	dig = intd;
-}
-
-void IntNumItem :: DrawItem(void)
+void IntNumItem :: DrawItem(void) const
 {
 	char txt[6];
 
@@ -401,18 +371,7 @@ void IntNumItem :: DrawItem(void)
 	WriteString(this->x0, this->y0, txt, this->size, this->option);
 }
 
-RealNumItem :: RealNumItem(int32_t *val, uint8_t x, uint8_t y, uint8_t sz, uint8_t intd, uint8_t frad, uint8_t opt)
-{
-	value = val;
-	x0 = x;
-	y0 = y;
-	size = sz;
-	idig = intd;
-	fdig = frad;
-	option = opt;
-}
-
-void RealNumItem :: DrawItem(void)
+void RealNumItem :: DrawItem(void) const
 {
 	char txt[10];
 	int32_t val = *this->value;
@@ -430,32 +389,14 @@ void RealNumItem :: DrawItem(void)
 		WriteString(this->x0, this->y0, txt, this->size, this->option);
 }
 
-TextItem :: TextItem(char *st, uint8_t x, uint8_t y, uint8_t sz, uint8_t opt)
-{
-	str = st;
-	x0 = x;
-	y0 = y;
-	size = sz;
-	option = opt;
-}
-
-void TextItem :: DrawItem(void)
+void TextItem :: DrawItem(void) const
 {
 	WriteString(this->x0, this->y0, str, this->size, this->option);
 
 }
 
 
-BitmapItem :: BitmapItem(BitmapDef *bm, uint8_t x, uint8_t y, uint8_t opt)
-{
-	bmp = bm;
-	x0 = x;
-	y0 = y;
-	option = opt;
-
-}
-
-void BitmapItem :: DrawItem(void)
+void BitmapItem :: DrawItem(void) const
 {
 	DrawBitmap(this->x0, this->y0, this->bmp, this->option);
 }

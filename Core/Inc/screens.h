@@ -55,15 +55,17 @@ void SetBklit(uint16_t bri);
 
 class ScreenItem
 {
-public:
-	uint8_t x0;		//left/right offset
-	uint8_t y0;		//top offset
+protected:
+	uint8_t x0 = 0;		//left/right offset
+	uint8_t y0 = 0;		//top offset
 	uint8_t size = 8;	//screen height
-	uint8_t option;	//show/hide, blink, right-align
+	uint8_t option = 0;	//show/hide, blink, right-align
 
 public:
-	ScreenItem();
-	~ScreenItem(){}
+	ScreenItem() {};
+	ScreenItem(uint8_t x, uint8_t y, uint8_t sz, uint8_t opt) :
+		x0(x), y0(y), size(sz), option(opt) {};
+//	~ScreenItem(){}
 
 	void hide(void) {option |= DISPLAY_HIDE;}
 	void show(void) {option &= ~DISPLAY_HIDE;}
@@ -78,10 +80,11 @@ public:
 	void beep(void) {option |= DISPLAY_BEEP;}
 	void beepNo(void) {option &= ~DISPLAY_BEEP;}
 
-	void setOption(uint8_t opt, bool state);
-	bool getOption(uint8_t);
+	void setOption(uint8_t opt) {option |= opt;}
+	void clrOption(uint8_t opt) {option &= ~opt;}
+	bool getOption(uint8_t opt) {return ((option & opt) > 0) ? true : false;};
 
-	virtual void DrawItem(void){};
+	virtual void DrawItem(void) const = 0;
 
 };
 
@@ -92,12 +95,14 @@ public:
 	uint8_t dig = 3;		//number of digits
 
 public:
-	IntNumItem(int16_t *val) {value = val;}
-	IntNumItem(int16_t *val, uint8_t x, uint8_t y, uint8_t sz, uint8_t intd, uint8_t opt);
+	IntNumItem(int16_t *val) :
+		value(val) {};
+	IntNumItem(int16_t *val, uint8_t x, uint8_t y, uint8_t sz, uint8_t intd, uint8_t opt) :
+		ScreenItem(x, y, sz, opt), value(val), dig(intd) {};
 
 	int16_t *getValue(void) {return value;}
 
-	void DrawItem(void);
+	void DrawItem(void) const;
 };
 
 class RealNumItem : public ScreenItem
@@ -108,27 +113,31 @@ public:
 	uint8_t fdig = 1;	//digits in fractional part
 
 public:
-	RealNumItem(int32_t *val) {value = val;}
-	RealNumItem(int32_t*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
+	RealNumItem(int32_t *val) :
+		value(val) {};
+	RealNumItem(int32_t *val, uint8_t x, uint8_t y, uint8_t sz, uint8_t intd, uint8_t frad, uint8_t opt) :
+		ScreenItem(x, y, sz, opt), value(val), idig(intd), fdig(frad) {};
 
 	int32_t *getValue(void) {return value;}
 
-	void DrawItem(void);
+	void DrawItem(void) const;
 };
 
 class TextItem : public ScreenItem
 {
 public:
-	char *str;
+	const char *str;
 
 public:
-	TextItem(char *st) {str = st;}
-	TextItem(char *, uint8_t, uint8_t, uint8_t, uint8_t);
+	TextItem(char *st) :
+		str(st) {};
+	TextItem(char *st, uint8_t x, uint8_t y, uint8_t sz, uint8_t opt) :
+		ScreenItem(x, y, sz, opt), str(st) {};
 
-	char * getText(void) {return str;}
-	void setText(char *text) {str = text;}
+	const char * getText(void) {return str;}
+	void setText(const char *text) {str = text;}
 
-	void DrawItem(void);
+	void DrawItem(void) const;
 };
 
 class BitmapItem : public ScreenItem
@@ -137,12 +146,14 @@ public:
 	BitmapDef *bmp;
 
 public:
-	BitmapItem(BitmapDef *bm) {bmp = bm;}
-	BitmapItem(BitmapDef *, uint8_t, uint8_t, uint8_t);
+	BitmapItem(BitmapDef *bm) :
+		bmp(bm) {};
+	BitmapItem(BitmapDef *bm, uint8_t x, uint8_t y, uint8_t opt) :
+		ScreenItem(x, y, 8, opt), bmp(bm) {};
 
 	BitmapDef * getValue(void) {return bmp;}
 
-	void DrawItem(void);
+	void DrawItem(void) const;
 };
 
 #endif /* INC_SCREENS_H_ */
